@@ -28,6 +28,9 @@ module.exports = function (req, res, next) {
               var name = key.substring(4);
               var content = entry[key];
               var value = content.$t;
+              if (name.find("NOEX_") > -1) {
+                continue;
+              }
               if (value.toLowerCase().indexOf(query.toLowerCase()) > -1) {
                 queried = true;
               }
