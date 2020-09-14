@@ -13,7 +13,7 @@ module.exports = function (req, res, next) {
     if (!error && response.statusCode === 200) {
       var data = JSON.parse(response.body);
       var responseObj = {};
-      var rows = [];
+      var rows = {};
       var columns = {};
       if (data && data.feed && data.feed.entry) {
         for (var i = 0; i < data.feed.entry.length; i++) {
@@ -21,6 +21,7 @@ module.exports = function (req, res, next) {
           var keys = Object.keys(entry);
           var newRow = {};
           var queried = false;
+          var pkey = -1;
           for (var j = 0; j < keys.length; j++) {
             var gsxCheck = keys[j].indexOf('gsx$');
             if (gsxCheck > -1) {
@@ -28,7 +29,10 @@ module.exports = function (req, res, next) {
               var name = key.substring(4);
               var content = entry[key];
               var value = content.$t;
-              if (name.indexOf("NOEX_") > -1) {
+              if (pkey < 0 && !isNaN(value)) {
+                  pkey = Number(value);
+              }
+              if (name.indexOf("noex") > -1) {
                 continue;
               }
               if (value.toLowerCase().indexOf(query.toLowerCase()) > -1) {
@@ -49,7 +53,7 @@ module.exports = function (req, res, next) {
             }
           }
           if (queried === true) {
-            rows.push(newRow);
+            rows[pkey] = newRow;
           }
         }
         if (showColumns === true) {
