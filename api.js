@@ -60,7 +60,7 @@ module.exports = function (req, res, next) {
           responseObj['columns'] = columns;
         }
         if (showRows === true) {
-          responseObj['rows'] = JSON.stringify(rows, null, 4);
+          responseObj['rows'] = rows;
         }
         return res.status(200).json(responseObj);
       } else {
