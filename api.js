@@ -11,7 +11,14 @@ module.exports = function (req, res, next) {
 
   request(url, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      var data = JSON.parse(response.body);
+      var data = null;
+	  try {
+		data = JSON.parse(response.body);
+	  } catch (e) {
+		console.log("googlesheet:" + id + " table:" + sheet);
+		console.log(e);
+		return res.status(200).json({error:"JSON parse with " + e.name});
+	  }
       var responseObj = {};
       var rows = {};
       var columns = {};
@@ -29,8 +36,12 @@ module.exports = function (req, res, next) {
               var name = key.substring(4);
               var content = entry[key];
               var value = content.$t;
-              if (pkey < 0 && !isNaN(value)) {
-                  pkey = Number(value);
+              if (pkey < 0) {
+				if (isNaN(value)) {
+			      break;
+				} else {
+				  pkey = Number(value);  
+				}
               }
               if (name.indexOf("noex") > -1) {
                 continue;
